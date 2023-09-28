@@ -1,7 +1,7 @@
 sonarqube:
   image:
     repository: sonarqube
-    tag: 8.9.2-community
+    tag: 10.2.0-community
   service:
     type: LoadBalancer
     port: 9000
