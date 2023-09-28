@@ -3,5 +3,5 @@ sonarqube:
     repository: sonarqube
     tag: 8.9.2-community
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 9000
