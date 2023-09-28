@@ -1,24 +1,54 @@
 apiVersion: v2
 name: sonarqube
-description: A Helm chart for Kubernetes
-
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
+description: SonarQube is a self-managed, automatic code review tool that systematically helps you deliver clean code. As a core element of our Sonar solution, SonarQube integrates into your existing workflow and detects issues in your code to help you perform continuous code inspections of your projects. The tool analyses 30+ different programming languages and integrates into your CI pipeline and DevOps platform to ensure that your code meets high-quality standards.
 type: application
-
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.0
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
-appVersion: "1.16.0"
+version: 10.3.0
+appVersion: 10.2.0
+keywords:
+  - coverage
+  - security
+  - code
+  - quality
+home: https://www.sonarqube.org/
+icon: https://raw.githubusercontent.com/SonarSource/sonarqube-static-resources/master/helm/SonarQubeLogo.svg
+sources:
+  - https://github.com/SonarSource/helm-chart-sonarqube
+  - https://github.com/SonarSource/docker-sonarqube
+  - https://github.com/SonarSource/sonarqube
+kubeVersion: '>= 1.24.0-0'
+maintainers:
+  - name: leo-geoffroy-sonarsource
+    email: leo.geoffroy+helm@sonarsource.com
+  - name: carminevassallo
+    email: carmine.vassallo@sonarsource.com
+  - name: jCOTINEAU
+    email: jeremy.cotineau@sonarsource.com
+  - name: davividal
+    email: davi.koscianski-vidal@sonarsource.com
+annotations:
+  artifacthub.io/links: |
+    - name: support
+      url: https://community.sonarsource.com/
+    - name: Chart Source
+      url: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
+  artifacthub.io/changes: |
+    - kind: changed
+      description: "Update Chart's version to 10.3.0"
+    - kind: changed
+      description: "Update default images to the latest versions"
+    - kind: removed
+      description: "Remove the nginx-proxy-body annotation when nginx is disabled"
+    - kind: changed
+      description: "Enable post-upgrade in the change-admin-password hook"
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/images: |
+    - name: sonarqube
+      image: sonarqube:10.2.0-community
+dependencies:
+  - name: postgresql
+    version: 10.15.0
+    repository: https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
+    condition: postgresql.enabled
+  - name: ingress-nginx
+    version: 4.7.1
+    repository: https://kubernetes.github.io/ingress-nginx
