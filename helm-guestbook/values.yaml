@@ -5,13 +5,13 @@
 replicaCount: 1
 
 image:
-  repository: gcr.io/heptio-images/ks-guestbook-demo
-  tag: 0.1
+  repository: sonarqube:latest
+  tag: ""
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 80
+  type: NodePort
+  port: 9000
 
 ingress:
   enabled: false
