@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "firstchart.selectorLabels" . | nindent 4 }}
+    {{- include "sonarqube.selectorLabels" . | nindent 4 }}
