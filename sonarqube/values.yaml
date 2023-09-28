@@ -1,7 +1,109 @@
-sonarqube:
-  image:
-    repository: sonarqube
-    tag: 10.2.0-community
-  service:
-    type: LoadBalancer
-    port: 9000
+# Default values for sonarqube.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# If the deployment Type is set to Deployment sonarqube is deployed as a replica set.
+deploymentType: "StatefulSet"
+
+# There should not be more than 1 sonarqube instance connected to the same database. Please set this value to 1 or 0 (in case you need to scale down programmatically).
+replicaCount: 1
+
+# This will use the default deployment strategy unless it is overriden
+deploymentStrategy: {}
+# Uncomment this to scheduler pods on priority
+# priorityClassName: "high-priority"
+
+## Use an alternate scheduler, e.g. "stork".
+## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+##
+# schedulerName:
+
+## Is this deployment for OpenShift? If so, we help with SCCs
+OpenShift:
+  enabled: false
+  createSCC: true
+
+edition: "community"
+
+image:
+  repository: sonarqube
+  tag: 10.2.0-{{ .Values.edition }}
+  pullPolicy: IfNotPresent
+  # If using a private repository, the imagePullSecrets to use
+  # pullSecrets:
+  #   - name: my-repo-secret
+
+# Set security context for sonarqube pod
+securityContext:
+  fsGroup: 1000
+
+# Set security context for sonarqube container
+containerSecurityContext:
+  # Sonarqube dockerfile creates sonarqube user as UID and GID 1000
+  runAsUser: 1000
+
+# Settings to configure elasticsearch host requirements
+elasticsearch:
+  # DEPRECATED: Use initSysctl.enabled instead
+  configureNode: true
+  bootstrapChecks: true
+
+service:
+  type: ClusterIP
+  externalPort: 9000
+  internalPort: 9000
+  labels:
+  annotations: {}
+  # May be used in example for internal load balancing in GCP:
+  # cloud.google.com/load-balancer-type: Internal
+  # loadBalancerSourceRanges:
+  #   - 0.0.0.0/0
+  # loadBalancerIP: 1.2.3.4
+
+# Optionally create Network Policies
+networkPolicy:
+  enabled: false
+
+  # If you plan on using the jmx exporter, you need to define where the traffic is coming from
+  prometheusNamespace: "monitoring"
+
+  # If you are using a external database and enable network Policies to be created
+  # you will need to explicitly allow egress traffic to your database
+  # expects https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#networkpolicyspec-v1-networking-k8s-io
+  # additionalNetworkPolicys:
+
+# will be used as default for ingress path and probes path, will be injected in .Values.env as SONAR_WEB_CONTEXT
+# if .Values.env.SONAR_WEB_CONTEXT is set, this value will be ignored
+sonarWebContext: ""
+
+# also install the nginx ingress helm chart
+nginx:
+  enabled: false
+
+ingress:
+  enabled: false
+  # Used to create an Ingress record.
+  hosts:
+    - name: sonarqube.your-org.com
+      # Different clouds or configurations might need /* as the default path
+      # path: /
+      # For additional control over serviceName and servicePort
+      # serviceName: someService
+      # servicePort: somePort
+      # the pathType can be one of the following values: Exact|Prefix|ImplementationSpecific(default)
+      # pathType: ImplementationSpecific
+  annotations:
+  # kubernetes.io/tls-acme: "true"
+
+  # Set the ingressClassName on the ingress record
+  # ingressClassName: nginx
+
+# Additional labels for Ingress manifest file
+  # labels:
+  #  traffic-type: external
+  #  traffic-type: internal
+  tls: []
+  # Secrets must be manually created in the namespace. To generate a self-signed certificate (and private key) and then create the secret in the cluster please refer to official documentation available at https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
